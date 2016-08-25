@@ -1,0 +1,9 @@
+name: "blog-test"
+output_dir: "."
+navbar:
+  title: "Blog Test"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "About"
+      href: about.html

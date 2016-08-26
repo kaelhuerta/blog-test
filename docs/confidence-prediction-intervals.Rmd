@@ -1,0 +1,105 @@
+---
+title: "Confidence and Prediction Intervals"
+subtitle: "What are and when to use them"
+author: "Kael Huerta"
+date: "August, 2016"
+output:
+  tufte::tufte_html: default
+  tufte::tufte_handout:
+    citation_package: natbib
+    latex_engine: xelatex
+  tufte::tufte_book:
+    citation_package: natbib
+    latex_engine: xelatex
+bibliography: skeleton.bib
+link-citations: yes
+---
+
+```{r setup, include=FALSE}
+library(tufte)
+# invalidate cache when the tufte version changes
+knitr::opts_chunk$set(tidy = FALSE, cache.extra = packageVersion('tufte'),
+  echo = F, message = F, warning = F)
+options(htmltools.dir.version = FALSE)
+```
+
+```{r}
+## Libraries
+library(data.table)
+library(tidyr)
+library(ggplot2)
+library(plyr)
+library(dplyr)
+theme_set(theme_bw())
+```
+
+
+
+```{r}
+## Generated dataset
+set.seed(3003)
+dates <- seq(as.Date('2016-01-01'), as.Date(Sys.time()), by = 'day')
+n <- length(dates)
+trend <- cumsum(sample(c(-.5, .5), n, replace = T, prob = c(3/8, 5/8)))
+seas <- c(5, 1, 0, 3, 6, 8, 7)
+noise <- cumsum(rnorm(n, 0, 1))
+data <- data.table(dates, Trend = trend, `Weekly Seasonality` = seas,
+    `White Noise` = noise) %>%
+  mutate(Sales = Trend + `Weekly Seasonality` + `White Noise`)
+```
+
+
+
+
+
+
+
+
+# tl;dr
+
+The *confidence intervals* are recommended for checking where the adjusted
+model lies.
+The *prediction intervals* are recommended for checking where the
+predicted values may lie.
+
+### Tags
+
+```
+#confidence, #prediction, #probability #intervals
+```
+
+# Confidence and Prediction Intervals
+
+
+Let us start with an example to ilustrate the differences between the
+intervals.
+
+Suppose we run a business that recently has been increasing its sales and we
+do not get a lot of clients during weekends. 
+il
+
+
+
+```{r, echo = F, fig.cap = 'Notice how the trend is going upwards and we have little dips each weekend'}
+data %>%
+  gather(variable, value, -dates) %>%
+  ggplot(aes(x = dates, y = value, colour = variable)) +
+    # geom_point() +
+    geom_line() +
+    facet_wrap(~variable, ncol = 1, scale = 'free_y') +
+    xlab('Date') + ylab('') +
+    theme(legend.position = 'none')
+```
+
+
+
+```{r fig-margin, fig.margin = TRUE, fig.cap = "MPG vs horsepower, colored by transmission.", fig.width=3.5, fig.height=3.5, cache=TRUE}
+library(ggplot2)
+mtcars2 <- mtcars
+mtcars2$am <- factor(
+  mtcars$am, labels = c('automatic', 'manual')
+)
+ggplot(mtcars2, aes(hp, mpg, color = am)) +
+  geom_point() + geom_smooth() +
+  theme(legend.position = 'bottom')
+```
